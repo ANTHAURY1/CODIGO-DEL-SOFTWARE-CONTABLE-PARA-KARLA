@@ -1,0 +1,69 @@
+# Diccionario para almacenar las facturas
+facturas = {}
+
+# Función para agregar una factura
+def agregar_factura(numero_factura, cliente, monto):
+    facturas[numero_factura] = {
+        'cliente': cliente,
+        'monto': monto
+    }
+    print(f"Factura {numero_factura} agregada para {cliente} con monto de {monto}.")
+
+# Función para mostrar todas las facturas
+def mostrar_facturas():
+    if not facturas:
+        print("No hay facturas registradas.")
+        return
+    print("\nFacturas Registradas:")
+    for numero, datos in facturas.items():
+        print(f"Número: {numero}, Cliente: {datos['cliente']}, Monto: {datos['monto']}")
+
+# Función para calcular el total de ventas
+def calcular_total_ventas():
+    total = sum(datos['monto'] for datos in facturas.values())
+    print(f"\nEl total de ventas es: {total}")
+
+# Función para borrar una factura
+def borrar_factura(numero_factura):
+    if numero_factura in facturas:
+        del facturas[numero_factura]
+        print(f"Factura {numero_factura} eliminada.")
+    else:
+        print(f"La factura {numero_factura} no existe.")
+
+# Menú principal
+def menu():
+    while True:
+        print("\n1. Agregar Factura")
+        print("2. Mostrar Facturas")
+        print("3. Calcular Total de Ventas")
+        print("4. Borrar Factura")
+        print("5. Salir")
+        
+        opcion = input("\nSeleccione una opción: ")
+
+        if opcion == '1':
+            numero_factura = input("Número de factura: ")
+            cliente = input("Nombre del cliente: ")
+            monto = float(input("Monto de la factura: "))
+            agregar_factura(numero_factura, cliente, monto)
+        
+        elif opcion == '2':
+            mostrar_facturas()
+        
+        elif opcion == '3':
+            calcular_total_ventas()
+        
+        elif opcion == '4':
+            numero_factura = input("Ingrese el número de factura a eliminar: ")
+            borrar_factura(numero_factura)
+        
+        elif opcion == '5':
+            print("Saliendo del programa...")
+            break
+        
+        else:
+            print("Opción no válida, intente de nuevo.")
+
+# Ejecutar el menú
+menu()
