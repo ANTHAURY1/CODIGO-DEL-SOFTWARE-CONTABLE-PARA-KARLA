@@ -1,13 +1,21 @@
 # Diccionario para almacenar las facturas
 facturas = {}
 
-# Función para agregar una factura
-def agregar_factura(numero_factura, cliente, monto):
+# Función para agregar una factura con IVA, descuento y fecha
+def agregar_factura(numero_factura, cliente, fecha, monto, iva_porcentaje, descuento_porcentaje):
+    iva = monto * (iva_porcentaje / 100)
+    descuento = monto * (descuento_porcentaje / 100)
+    monto_final = monto + iva - descuento
+
     facturas[numero_factura] = {
         'cliente': cliente,
-        'monto': monto
+        'fecha': fecha,
+        'monto': monto,
+        'iva': iva,
+        'descuento': descuento,
+        'monto_final': monto_final
     }
-    print(f"Factura {numero_factura} agregada para {cliente} con monto de {monto}.")
+    print(f"Factura {numero_factura} agregada para {cliente} en fecha {fecha} con un monto final de {monto_final} (IVA: {iva}, Descuento: {descuento}).")
 
 # Función para mostrar todas las facturas
 def mostrar_facturas():
@@ -16,11 +24,11 @@ def mostrar_facturas():
         return
     print("\nFacturas Registradas:")
     for numero, datos in facturas.items():
-        print(f"Número: {numero}, Cliente: {datos['cliente']}, Monto: {datos['monto']}")
+        print(f"Número: {numero}, Cliente: {datos['cliente']}, Fecha: {datos['fecha']}, Monto Base: {datos['monto']}, IVA: {datos['iva']}, Descuento: {datos['descuento']}, Monto Final: {datos['monto_final']}")
 
 # Función para calcular el total de ventas
 def calcular_total_ventas():
-    total = sum(datos['monto'] for datos in facturas.values())
+    total = sum(datos['monto_final'] for datos in facturas.values())
     print(f"\nEl total de ventas es: {total}")
 
 # Función para borrar una factura
@@ -31,6 +39,39 @@ def borrar_factura(numero_factura):
     else:
         print(f"La factura {numero_factura} no existe.")
 
+# Función para borrar todas las facturas de un cliente
+def borrar_usuario(cliente):
+    facturas_a_eliminar = [num for num, datos in facturas.items() if datos['cliente'] == cliente]
+    
+    if not facturas_a_eliminar:
+        print(f"No se encontraron facturas para el cliente {cliente}.")
+    else:
+        for num in facturas_a_eliminar:
+            del facturas[num]
+        print(f"Se han eliminado todas las facturas del cliente {cliente}.")
+
+# Función para modificar los datos de una factura
+def modificar_datos_factura(numero_factura, nuevo_cliente=None, nueva_fecha=None, nuevo_monto=None):
+    if numero_factura in facturas:
+        if nuevo_cliente:
+            facturas[numero_factura]['cliente'] = nuevo_cliente
+        if nueva_fecha:
+            facturas[numero_factura]['fecha'] = nueva_fecha
+        if nuevo_monto:
+            monto = nuevo_monto
+            iva_porcentaje = 19  # Puedes ajustar esto según tu lógica
+            descuento_porcentaje = 10  # Puedes ajustar esto según tu lógica
+            iva = monto * (iva_porcentaje / 100)
+            descuento = monto * (descuento_porcentaje / 100)
+            monto_final = monto + iva - descuento
+            facturas[numero_factura]['monto'] = monto
+            facturas[numero_factura]['iva'] = iva
+            facturas[numero_factura]['descuento'] = descuento
+            facturas[numero_factura]['monto_final'] = monto_final
+        print(f"Datos de la factura {numero_factura} actualizados.")
+    else:
+        print(f"La factura {numero_factura} no existe.")
+
 # Menú principal
 def menu():
     while True:
@@ -38,15 +79,20 @@ def menu():
         print("2. Mostrar Facturas")
         print("3. Calcular Total de Ventas")
         print("4. Borrar Factura")
-        print("5. Salir")
+        print("5. Borrar Usuario")
+        print("6. Modificar Factura")
+        print("7. Salir")
         
         opcion = input("\nSeleccione una opción: ")
 
         if opcion == '1':
             numero_factura = input("Número de factura: ")
             cliente = input("Nombre del cliente: ")
+            fecha = input("Fecha de la factura (dd/mm/aaaa): ")
             monto = float(input("Monto de la factura: "))
-            agregar_factura(numero_factura, cliente, monto)
+            iva_porcentaje = float(input("Porcentaje de IVA: "))
+            descuento_porcentaje = float(input("Porcentaje de Descuento: "))
+            agregar_factura(numero_factura, cliente, fecha, monto, iva_porcentaje, descuento_porcentaje)
         
         elif opcion == '2':
             mostrar_facturas()
@@ -59,6 +105,18 @@ def menu():
             borrar_factura(numero_factura)
         
         elif opcion == '5':
+            cliente = input("Ingrese el nombre del cliente a eliminar: ")
+            borrar_usuario(cliente)
+        
+        elif opcion == '6':
+            numero_factura = input("Ingrese el número de la factura a modificar: ")
+            nuevo_cliente = input("Nuevo nombre del cliente (dejar en blanco para no cambiar): ")
+            nueva_fecha = input("Nueva fecha de la factura (dejar en blanco para no cambiar): ")
+            nuevo_monto = input("Nuevo monto de la factura (dejar en blanco para no cambiar): ")
+            nuevo_monto = float(nuevo_monto) if nuevo_monto else None
+            modificar_datos_factura(numero_factura, nuevo_cliente, nueva_fecha, nuevo_monto)
+        
+        elif opcion == '7':
             print("Saliendo del programa...")
             break
         
